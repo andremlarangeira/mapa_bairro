@@ -23,6 +23,8 @@ trocaIcone();
 
 var map;
 var markers = [];
+var infowindow = {};
+var gMaps = {};
 var locations = [{
       title: 'Casa',
       location: {
@@ -74,35 +76,9 @@ var locations = [{
    }
 ];
 
-
-
-
-
-/*viewmodel do knockoutjs*/
-function ViewModel() {
-   var self = this;
-   self.locationList = ko.observableArray(locations);
-   self.busca = ko.observable();
-   self.filtraBusca = function (location){
-      var title = location.title.toUpperCase();
-      var busca = self.busca() ? self.busca().toUpperCase() : "";
-      return title.includes(busca);
-   };
-   self.filtro = ko.computed(function(){
-      return self.locationList().filter(self.filtraBusca);
-   });
-}
-
-/*inicializacao knockoutjs*/
-ko.applyBindings(ViewModel());
-
-console.log(ko);
-// for (var i = 0; i < ko.ViewModel.filtro.length; i++) {
-//    console.log(ko.ViewModel.filtro[i]);
-// }
-
 /*inicia o mapa e adiciona os marcadores*/
 function initMap() {
+   gMaps = google.maps;
    map = new google.maps.Map(document.getElementById('map'), {
       center: {
          lat: -22.738729,
@@ -111,11 +87,26 @@ function initMap() {
       zoom: 15
    });
 
-   var infowindow = new google.maps.InfoWindow();
+   infowindow = new google.maps.InfoWindow();
 
-   for (var i = 0; i < locations.length; i++) {
-      var title = locations[i].title;
-      var position = locations[i].location;
+   loadMarkers(locations);
+   initKnokout();
+}
+
+function removeMarkers(){
+    for(i=0; i<markers.length; i++){
+        markers[i].setMap(null);
+    }
+}
+
+function loadMarkers(arrayLocations){
+   removeMarkers();
+   markers = [];
+   for (var i = 0; i < arrayLocations.length; i++) {
+      var title = arrayLocations[i].title;
+      var position = arrayLocations[i].location;
+      // console.log(title);
+
       var marker = new google.maps.Marker({
          map: map,
          position: position,
@@ -142,3 +133,32 @@ function initMap() {
       }
    }
 }
+
+
+
+/*viewmodel do knockoutjs*/
+function ViewModel() {
+   var self = this;
+   self.locationList = ko.observableArray(locations);
+   self.busca = ko.observable();
+   self.filtraBusca = function (location){
+      var title = location.title.toUpperCase();
+      var busca = self.busca() ? self.busca().toUpperCase() : "";
+      // console.log(busca);
+      return title.includes(busca);
+   };
+   self.filtro = ko.computed(function(){
+      var arrayFiltro = self.locationList().filter(self.filtraBusca);
+      loadMarkers(arrayFiltro);
+      return arrayFiltro;
+   });
+}
+
+/*inicializacao knockoutjs*/
+function initKnokout(){
+   ko.applyBindings(ViewModel());
+};
+
+// for (var i = 0; i < ko.ViewModel.filtro.length; i++) {
+//    console.log(ko.ViewModel.filtro[i]);
+// }
