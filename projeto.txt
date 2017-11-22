@@ -1,0 +1,63 @@
+Como vou realizar esse projeto?
+Reveja nosso curso Padrões de design JavaScript.
+Baixe o framework Knockout. O Knockout deve ser usado para lidar com lista, filtro
+ e todas as outras informações na página que estejam sujeitas a alteração de estado.
+ Itens que não devem ser processados pelo knockout: qualquer coisa para a qual a
+ api do mapa seja usada, criar marcadores, rastrear seus eventos de clique, criar
+  e atualizar o mapa.
+
+Escreva o código necessário para adicionar um mapa de tela inteira à sua página
+ usando a API do Google Maps. Para fins de eficiência, a API do mapa deve ser
+ chamada somente uma vez.
+
+Escreve o código necessário para exibir marcadores de mapa que identifiquem pelo
+menos 5 locais de interesse do bairro em questão. Seu aplicativo deve exibir esses
+ locais por padrão quando a página é carregada.
+
+Implemente uma exibição de lista do conjunto de locais definidos na etapa 4.
+Forneça uma opção de filtragem que usa um campo de entrada para filtrar tanto a
+ exibição de lista quanto os marcadores do mapa mostrados por padrão durante o
+ carregamento. A exibição de lista e os marcadores devem ser atualizados de acordo.
+ Fornecer uma função de pesquisa em uma API de terceiros não é suficiente para
+ atender às especificações.
+
+Adicione outros recursos usando as APIs de terceiros para fornecer informações
+quando um marcador de mapa ou uma entrada da exibição de lista for clicada
+(por ex. revisões do Yelp, Wikipédia, imagens do Flickr, etc). Observe que
+StreetView e Places não contam como uma API adicional de terceiros porque são
+bibliotecas incluídas na API do Google Maps. Se você precisar de uma atualização
+sobre como fazer requisições AJAX para servidores de terceiros, consulte nosso
+curso Introdução ao AJAX. Especifique a atribuição às fontes de dados/APIs que
+você usa. Por exemplo, se você estiver usando o Foursquare, indique em algum lugar
+ da sua interface e no seu README que a API do Foursquare foi utilizada.
+Adicione outros recursos para animar um marcador de mapa quando o item da lista
+
+ associado a ele ou o próprio marcador de mapa for selecionado.
+Adicione outros recursos para abrir uma infoWindow com as informações descritas
+na etapa 7 (você também pode preencher um elemento DOM com essas informações,
+mas ainda deve abrir uma infoWindow, mesmo com informações mínimas, como nome
+do local) quando um local for selecionado na exibição de lista ou seu marcador e
+ mapa for selecionado diretamente.
+A Interface do aplicativo deve ser muito intuitiva de se usar. Por exemplo, a
+área de texto de entrada para filtrar locais deve ser fácil de localizar. Deve
+ser fácil entender qual conjunto de locais está sendo filtrado. Selecionar um
+local por meio do item de lista ou do marcador de mapa deve fazer com que o
+marcador de mapa salte ou seja animado de alguma outra forma para indicar que
+o local foi selecionado, e a janela de informações associada deve ser aberta
+acima do marcador com informações adicionais.
+Tratamento de erros: Em caso de erro (por exemplo, em uma situação na qual uma
+api de terceiros não retorna o resultado esperado), esperamos que sua página da
+Web execute uma destas ações: Uma mensagem é exibida notificando o usuário de
+que os dados não podem ser carregados OU não há repercussões negativas para a
+interface de usuário. Observação: observe que esperamos que os alunos tratem dos
+ erros se o navegador tiver problemas para acessar inicialmente o site de
+ terceiros também. Por exemplo, imagine um usuário que esteja utilizando um mapa
+  da vizinhança, mas o firewall impeça seu acesso aos servidores do Instagram.
+  Veja aqui um artigo de referência sobre como bloquear sites com o arquivo de
+  hosts. É importante tratar os erros para proporcionar aos usuários uma
+  experiência boa e consistente com a página da Web. Leia esta postagem em um
+  blog para saber mais. Algumas bibliotecas JavaScript libraries fornecem métodos
+   especiais para o tratamento de erros. Por exemplo: consulte o método .fail()
+   discutido aqui se você usar o método ajax() do jQuery. Nós recomendamos
+   enfaticamente que você explore maneiras de tratar os erros na biblioteca que
+   está usando para fazer chamadas de API.
