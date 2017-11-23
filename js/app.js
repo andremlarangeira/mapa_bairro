@@ -116,7 +116,10 @@ function loadMarkers(arrayLocations){
       });
       markers.push(marker);
 
-      marker.addListener('click', function() {
+      // marker.addListener('click', function() {
+      //    populateInfoWindow(this, infowindow);
+      // });
+      google.maps.event.addListener(marker, 'click', function() {
          populateInfoWindow(this, infowindow);
       });
 
@@ -152,6 +155,11 @@ function ViewModel() {
       loadMarkers(arrayFiltro);
       return arrayFiltro;
    });
+
+   self.clickItem = function(item){
+         var i = self.filtro().indexOf(item);
+         google.maps.event.trigger(markers[i], 'click');
+   }
 }
 
 /*inicializacao knockoutjs*/

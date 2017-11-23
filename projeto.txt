@@ -1,4 +1,4 @@
-Como vou realizar esse projeto?
+﻿Como vou realizar esse projeto?
 Reveja nosso curso Padrões de design JavaScript.
 Baixe o framework Knockout. O Knockout deve ser usado para lidar com lista, filtro
  e todas as outras informações na página que estejam sujeitas a alteração de estado.
@@ -25,19 +25,21 @@ Adicione outros recursos usando as APIs de terceiros para fornecer informações
 quando um marcador de mapa ou uma entrada da exibição de lista for clicada
 (por ex. revisões do Yelp, Wikipédia, imagens do Flickr, etc). Observe que
 StreetView e Places não contam como uma API adicional de terceiros porque são
-bibliotecas incluídas na API do Google Maps. Se você precisar de uma atualização
+bibliotecas incluídas na API do Google Maps. 
+Se você precisar de uma atualização
 sobre como fazer requisições AJAX para servidores de terceiros, consulte nosso
 curso Introdução ao AJAX. Especifique a atribuição às fontes de dados/APIs que
 você usa. Por exemplo, se você estiver usando o Foursquare, indique em algum lugar
  da sua interface e no seu README que a API do Foursquare foi utilizada.
 Adicione outros recursos para animar um marcador de mapa quando o item da lista
+associado a ele ou o próprio marcador de mapa for selecionado.
 
- associado a ele ou o próprio marcador de mapa for selecionado.
 Adicione outros recursos para abrir uma infoWindow com as informações descritas
 na etapa 7 (você também pode preencher um elemento DOM com essas informações,
 mas ainda deve abrir uma infoWindow, mesmo com informações mínimas, como nome
 do local) quando um local for selecionado na exibição de lista ou seu marcador e
  mapa for selecionado diretamente.
+
 A Interface do aplicativo deve ser muito intuitiva de se usar. Por exemplo, a
 área de texto de entrada para filtrar locais deve ser fácil de localizar. Deve
 ser fácil entender qual conjunto de locais está sendo filtrado. Selecionar um
