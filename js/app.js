@@ -81,8 +81,8 @@ function initMap() {
    gMaps = google.maps;
    map = new google.maps.Map(document.getElementById('map'), {
       center: {
-         lat: -22.738729,
-         lng: -47.616529
+         lat: -22.738382,
+         lng: -47.630451
       },
       zoom: 15
    });
@@ -93,13 +93,13 @@ function initMap() {
    initKnokout();
 }
 
-function removeMarkers(){
-    for(i=0; i<markers.length; i++){
-        markers[i].setMap(null);
-    }
+function removeMarkers() {
+   for (i = 0; i < markers.length; i++) {
+      markers[i].setMap(null);
+   }
 }
 
-function loadMarkers(arrayLocations){
+function loadMarkers(arrayLocations) {
    removeMarkers();
    markers = [];
    for (var i = 0; i < arrayLocations.length; i++) {
@@ -120,23 +120,32 @@ function loadMarkers(arrayLocations){
       //    populateInfoWindow(this, infowindow);
       // });
       google.maps.event.addListener(marker, 'click', function() {
+         animaMarker(this);
          populateInfoWindow(this, infowindow);
       });
 
       function populateInfoWindow(marker, infowindow) {
          if (infowindow.marker != marker) {
             infowindow.marker = marker;
-            infowindow.setContent('<div>' + marker.title + '</div>');
-            infowindow.open(map, marker);
+         };
+         infowindow.setContent('<div>' + marker.title + '</div>');
+         infowindow.open(map, marker);
 
-            infowindow.addListener('closeclick', function() {
-               infowindow.setMarker(null);
-            });
+         infowindow.addListener('closeclick', function() {
+            infowindow.close();
+         });
+      };
+
+      function animaMarker(marker) {
+         console.log(marker.title);
+         if (marker.getAnimation() !== null) {
+            marker.setAnimation(null);
+         } else {
+            marker.setAnimation(google.maps.Animation.BOUNCE);
          }
       }
    }
 }
-
 
 
 /*viewmodel do knockoutjs*/
@@ -144,26 +153,26 @@ function ViewModel() {
    var self = this;
    self.locationList = ko.observableArray(locations);
    self.busca = ko.observable();
-   self.filtraBusca = function (location){
+   self.filtraBusca = function(location) {
       var title = location.title.toUpperCase();
       var busca = self.busca() ? self.busca().toUpperCase() : "";
       // console.log(busca);
       return title.includes(busca);
    };
-   self.filtro = ko.computed(function(){
+   self.filtro = ko.computed(function() {
       var arrayFiltro = self.locationList().filter(self.filtraBusca);
       loadMarkers(arrayFiltro);
       return arrayFiltro;
    });
 
-   self.clickItem = function(item){
-         var i = self.filtro().indexOf(item);
-         google.maps.event.trigger(markers[i], 'click');
+   self.clickItem = function(item) {
+      var i = self.filtro().indexOf(item);
+      google.maps.event.trigger(markers[i], 'click');
    }
 }
 
 /*inicializacao knockoutjs*/
-function initKnokout(){
+function initKnokout() {
    ko.applyBindings(ViewModel());
 };
 
