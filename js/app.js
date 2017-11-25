@@ -30,59 +30,67 @@ var locations = [{
       location: {
          lat: -22.738729,
          lng: -47.616529
-      }
+      },
+      selected: false
    },
    {
       title: 'Coop',
       location: {
          lat: -22.738893,
          lng: -47.628706
-      }
+      },
+      selected: false
    },
    {
       title: 'Lobato',
       location: {
          lat: -22.746132,
          lng: -47.635882
-      }
+      },
+      selected: false
    },
    {
       title: 'Padaria',
       location: {
          lat: -22.7389413,
          lng: -47.6252318
-      }
+      },
+      selected: false
    },
    {
       title: 'Terminal',
       location: {
          lat: -22.7358604,
          lng: -47.6292229
-      }
+      },
+      selected: false
    },
    {
       title: 'Condominio',
       location: {
          lat: -22.7369278,
          lng: -47.6299448
-      }
+      },
+      selected: false
    },
    {
       title: 'Banco',
       location: {
          lat: -22.7380874,
          lng: -47.6292498
-      }
+      },
+      selected: false
    }
 ];
 
 /*inicia o mapa e adiciona os marcadores*/
 function initMap() {
    gMaps = google.maps;
+
    map = new google.maps.Map(document.getElementById('map'), {
       center: {
-         lat: -22.738729,
-         lng: -47.616529
+         lat: -22.7406543,
+         lng: -47.6300095
       },
       zoom: 15
    });
@@ -93,13 +101,29 @@ function initMap() {
    initKnokout();
 }
 
-function removeMarkers(){
-    for(i=0; i<markers.length; i++){
-        markers[i].setMap(null);
-    }
+function removeMarkers() {
+   for (i = 0; i < markers.length; i++) {
+      markers[i].setMap(null);
+   }
 }
 
-function loadMarkers(arrayLocations){
+function makeMarkerIcon(markerColor) {
+   var markerImage = new google.maps.MarkerImage(
+      'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
+      '|40|_|%E2%80%A2',
+      new google.maps.Size(21, 34),
+      new google.maps.Point(0, 0),
+      new google.maps.Point(10, 34),
+      new google.maps.Size(21, 34));
+   return markerImage;
+}
+
+function loadMarkers(arrayLocations) {
+   // Style the markers a bit. This will be our listing marker icon.
+   var defaultIcon = makeMarkerIcon('4db6ac');
+   // Create a "highlighted location" marker color for when the user
+   // mouses over the marker
+   var highlightedIcon = makeMarkerIcon('42a5f5');
    removeMarkers();
    markers = [];
    for (var i = 0; i < arrayLocations.length; i++) {
@@ -112,6 +136,7 @@ function loadMarkers(arrayLocations){
          position: position,
          title: title,
          animation: google.maps.Animation.DROP,
+         icon: defaultIcon,
          id: i
       });
       markers.push(marker);
@@ -121,6 +146,15 @@ function loadMarkers(arrayLocations){
       // });
       google.maps.event.addListener(marker, 'click', function() {
          populateInfoWindow(this, infowindow);
+
+      });
+
+      marker.addListener('mouseover', function() {
+         this.setIcon(highlightedIcon);
+      });
+
+      marker.addListener('mouseout', function() {
+         this.setIcon(defaultIcon);
       });
 
       function populateInfoWindow(marker, infowindow) {
@@ -133,7 +167,7 @@ function loadMarkers(arrayLocations){
                infowindow.setMarker(null);
             });
          }
-      }
+      };
    }
 }
 
@@ -144,26 +178,26 @@ function ViewModel() {
    var self = this;
    self.locationList = ko.observableArray(locations);
    self.busca = ko.observable();
-   self.filtraBusca = function (location){
+   self.filtraBusca = function(location) {
       var title = location.title.toUpperCase();
       var busca = self.busca() ? self.busca().toUpperCase() : "";
-      // console.log(busca);
       return title.includes(busca);
    };
-   self.filtro = ko.computed(function(){
+   self.filtro = ko.computed(function() {
       var arrayFiltro = self.locationList().filter(self.filtraBusca);
       loadMarkers(arrayFiltro);
       return arrayFiltro;
    });
 
-   self.clickItem = function(item){
-         var i = self.filtro().indexOf(item);
-         google.maps.event.trigger(markers[i], 'click');
-   }
+   self.clickItem = function(item) {
+      var i = self.filtro().indexOf(item);
+      console.log(i);
+      google.maps.event.trigger(markers[i], 'click');
+   };
 }
 
 /*inicializacao knockoutjs*/
-function initKnokout(){
+function initKnokout() {
    ko.applyBindings(ViewModel());
 };
 
