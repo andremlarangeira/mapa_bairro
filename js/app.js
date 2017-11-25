@@ -91,6 +91,7 @@ function initMap() {
       center: {
          lat: -22.7406543,
          lng: -47.6300095
+
       },
       zoom: 15
    });
@@ -101,6 +102,7 @@ function initMap() {
    initKnokout();
 }
 
+<<<<<<< HEAD
 function removeMarkers() {
    for (i = 0; i < markers.length; i++) {
       markers[i].setMap(null);
@@ -118,12 +120,14 @@ function makeMarkerIcon(markerColor) {
    return markerImage;
 }
 
+
 function loadMarkers(arrayLocations) {
    // Style the markers a bit. This will be our listing marker icon.
    var defaultIcon = makeMarkerIcon('4db6ac');
    // Create a "highlighted location" marker color for when the user
    // mouses over the marker
    var highlightedIcon = makeMarkerIcon('42a5f5');
+
    removeMarkers();
    markers = [];
    for (var i = 0; i < arrayLocations.length; i++) {
@@ -145,6 +149,7 @@ function loadMarkers(arrayLocations) {
       //    populateInfoWindow(this, infowindow);
       // });
       google.maps.event.addListener(marker, 'click', function() {
+         animaMarker(this);
          populateInfoWindow(this, infowindow);
 
       });
@@ -160,17 +165,25 @@ function loadMarkers(arrayLocations) {
       function populateInfoWindow(marker, infowindow) {
          if (infowindow.marker != marker) {
             infowindow.marker = marker;
-            infowindow.setContent('<div>' + marker.title + '</div>');
-            infowindow.open(map, marker);
+         };
+         infowindow.setContent('<div>' + marker.title + '</div>');
+         infowindow.open(map, marker);
 
-            infowindow.addListener('closeclick', function() {
-               infowindow.setMarker(null);
-            });
+         infowindow.addListener('closeclick', function() {
+            infowindow.close();
+         });
+      };
+
+      function animaMarker(marker) {
+         console.log(marker.title);
+         if (marker.getAnimation() !== null) {
+            marker.setAnimation(null);
+         } else {
+            marker.setAnimation(google.maps.Animation.BOUNCE);
          }
       };
    }
 }
-
 
 
 /*viewmodel do knockoutjs*/
