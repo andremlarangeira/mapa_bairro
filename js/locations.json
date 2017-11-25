@@ -1,0 +1,60 @@
+{
+	"locations": [
+		{
+			"title": "Casa",
+			"location": {
+				"lat": -22.738729,
+				"lng": -47.616529
+			},
+			"selected": false
+		},
+		{
+			"title": "Coop",
+			"location": {
+				"lat": -22.738893,
+				"lng": -47.628706
+			},
+			"selected": false
+		},
+		{
+			"title": "Lobato",
+			"location": {
+				"lat": -22.746132,
+				"lng": -47.635882
+			},
+			"selected": false
+		},
+		{
+			"title": "Padaria",
+			"location": {
+				"lat": -22.7389413,
+				"lng": -47.6252318
+			},
+			"selected": false
+		},
+		{
+			"title": "Terminal",
+			"location": {
+				"lat": -22.7358604,
+				"lng": -47.6292229
+			},
+			"selected": false
+		},
+		{
+			"title": "Condominio",
+			"location": {
+				"lat": -22.7369278,
+				"lng": -47.6299448
+			},
+			"selected": false
+		},
+		{
+			"title": "Banco",
+			"location": {
+				"lat": -22.7380874,
+				"lng": -47.6292498
+			},
+			"selected": false
+		}
+	]
+}
