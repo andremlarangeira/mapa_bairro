@@ -92,7 +92,6 @@ function loadMarkers(arrayLocations) {
    for (var i = 0; i < arrayLocations.length; i++) {
       var title = arrayLocations[i].title;
       var position = arrayLocations[i].location;
-      console.log(title);
 
       var marker = new google.maps.Marker({
          map: map,
@@ -158,15 +157,24 @@ function loadMarkers(arrayLocations) {
 
       /*funcao que anima o marcador para dar destaque ao marcador selecionado*/
       function animaMarker(marker) {
-         console.log(marker.title);
          if (marker.getAnimation() !== null) {
             marker.setAnimation(null);
+            marker.setIcon(defaultIcon);
          } else {
             marker.setAnimation(google.maps.Animation.BOUNCE);
+            marker.setIcon(highlightedIcon);
          }
       };
    }
 }
+
+function updateArray(array){
+   for(var i = 0; i < array.length; i++){
+      array[i].selected = ko.observable(array[i].selected)
+   }
+   return array;
+};
+
 
 
 /*viewmodel do knockoutjs*/
@@ -175,8 +183,9 @@ function ViewModel() {
       para usarmos nas funcoes e referenciar o viewmodel*/
    var self = this;
 
+
    /*define os observables que serão usados no html para*/
-   self.locationList = ko.observableArray(locations);
+   self.locationList = ko.observableArray(updateArray(locations));
    self.busca = ko.observable();
 
    /*funcao que verifica no objeto passado por parametro se a propriedade titulo
@@ -208,10 +217,15 @@ function ViewModel() {
       return arrayFiltro;
    });
 
+   function selecionaItem(index){
+      self.filtro()
+   }
+
    /*se algum item do menu lateral for clicado pega o indice do elemento clicado
     e aciona o evento click do marcador correspondente*/
    self.clickItem = function(item) {
       var i = self.filtro().indexOf(item);
+      self.filtro()[i].selected(!self.filtro()[i].selected());
       google.maps.event.trigger(markers[i], 'click');
    };
 }
