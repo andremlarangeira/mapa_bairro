@@ -26,9 +26,8 @@ trocaIcone();
 var map;
 var markers = [];
 var infowindow = {};
-
 var locations = [];
-
+// var vm = {};
 /*inicia o mapa e adiciona os marcadores*/
 function initMap() {
    map = new google.maps.Map(document.getElementById('map'), {
@@ -44,12 +43,27 @@ function initMap() {
    /*carrega o arquivo JSON e passa o conteudo de locations para o array locations*/
    $.getJSON("js/locations.json", function(data){
       locations = data.locations;
-      /*chama a funcao loadMarkers que carrega os marcadores com base no array locations*/
-      loadMarkers(locations);
       /*inicia o knockoutjs*/
       initKnokout();
+      /*chama a funcao loadMarkers que carrega os marcadores com base no array locations*/
+      //loadMarkers(locations);
    });
 }
+
+
+
+
+/*viewmodel do knockoutjs*/
+function ViewModel() {
+   /*passa o contexto de this que se refere ao viemodel para a variavel self,
+      para usarmos nas funcoes e referenciar o viewmodel*/
+   var self = this;
+
+
+
+
+
+/*****************************************************************************/
 
 /*remove os marcadores da tela*/
 function removeMarkers() {
@@ -60,7 +74,7 @@ function removeMarkers() {
 
 
 /*funcao que carrega o icone do marcador na cor passada por parametro.
-  funcao usada no modulo, começando com APIs*/
+  funcao usada no modulo: começando com APIs*/
 function makeMarkerIcon(markerColor) {
    var markerImage = new google.maps.MarkerImage(
       'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
@@ -106,19 +120,24 @@ function loadMarkers(arrayLocations) {
       /*se clicar no marcador, chama as funcoes de animar o marcadore e de criar
          a infowindow*/
       marker.addListener('click', function() {
+         console.log(self.filtro()[0].selected());
+         if(this.animating == false){
+            populateInfoWindow(this, infowindow);
+         } else {
+            infowindow.close();
+         }
          animaMarker(this);
-         populateInfoWindow(this, infowindow);
       });
 
       /*se passar o mouse por cima do marcador troca o icone do marcador*/
-      marker.addListener('mouseover', function() {
-         this.setIcon(highlightedIcon);
-      });
+      // marker.addListener('mouseover', function() {
+      //    this.setIcon(highlightedIcon);
+      // });
 
       /*ao retirar o mouse de cima do marcador retorna o icone para o padrao*/
-      marker.addListener('mouseout', function() {
-         this.setIcon(defaultIcon);
-      });
+      // marker.addListener('mouseout', function() {
+      //    this.setIcon(defaultIcon);
+      // });
 
       /*funcao que cria e configura a infowindow*/
       function populateInfoWindow(marker, infowindow) {
@@ -155,33 +174,34 @@ function loadMarkers(arrayLocations) {
          });
       };
 
+      function markersStopAnim(){
+         for(var i = 0; i < markers.length; i++){
+            markers[i].setAnimation(null);
+         }
+      }
+
       /*funcao que anima o marcador para dar destaque ao marcador selecionado*/
       function animaMarker(marker) {
-         if (marker.getAnimation() !== null) {
-            marker.setAnimation(null);
-            marker.setIcon(defaultIcon);
-         } else {
+         markersStopAnim();
             marker.setAnimation(google.maps.Animation.BOUNCE);
-            marker.setIcon(highlightedIcon);
-         }
       };
    }
 }
 
 function updateArray(array){
    for(var i = 0; i < array.length; i++){
-      array[i].selected = ko.observable(array[i].selected)
+      array[i].selected = ko.observable(false)
    }
    return array;
 };
 
 
+/*****************************************************************************/
 
-/*viewmodel do knockoutjs*/
-function ViewModel() {
-   /*passa o contexto de this que se refere ao viemodel para a variavel self,
-      para usarmos nas funcoes e referenciar o viewmodel*/
-   var self = this;
+
+
+
+
 
 
    /*define os observables que serão usados no html para*/
@@ -217,9 +237,6 @@ function ViewModel() {
       return arrayFiltro;
    });
 
-   function selecionaItem(index){
-      self.filtro()
-   }
 
    /*se algum item do menu lateral for clicado pega o indice do elemento clicado
     e aciona o evento click do marcador correspondente*/
@@ -229,8 +246,9 @@ function ViewModel() {
       google.maps.event.trigger(markers[i], 'click');
    };
 }
-
+var vm = {};
 /*funcao de inicializacao knockoutjs*/
 function initKnokout() {
-   ko.applyBindings(ViewModel());
+   vm = new ViewModel();
+   ko.applyBindings(ViewModel);
 };
