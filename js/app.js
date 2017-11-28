@@ -27,6 +27,7 @@ var map;
 var markers = [];
 var infowindow = {};
 var locations = [];
+var aIndex = 0;
 // var vm = {};
 /*inicia o mapa e adiciona os marcadores*/
 function initMap() {
@@ -41,7 +42,7 @@ function initMap() {
    infowindow = new google.maps.InfoWindow();
 
    /*carrega o arquivo JSON e passa o conteudo de locations para o array locations*/
-   $.getJSON("js/locations.json", function(data){
+   $.getJSON("js/locations.json", function(data) {
       locations = data.locations;
       /*inicia o knockoutjs*/
       initKnokout();
@@ -54,7 +55,7 @@ function initMap() {
 
 
 /*viewmodel do knockoutjs*/
-function ViewModel() {
+var ViewModel = function() {
    /*passa o contexto de this que se refere ao viemodel para a variavel self,
       para usarmos nas funcoes e referenciar o viewmodel*/
    var self = this;
@@ -63,140 +64,148 @@ function ViewModel() {
 
 
 
-/*****************************************************************************/
+   /*****************************************************************************/
 
-/*remove os marcadores da tela*/
-function removeMarkers() {
-   for (i = 0; i < markers.length; i++) {
-      markers[i].setMap(null);
-   }
-}
-
-
-/*funcao que carrega o icone do marcador na cor passada por parametro.
-  funcao usada no modulo: começando com APIs*/
-function makeMarkerIcon(markerColor) {
-   var markerImage = new google.maps.MarkerImage(
-      'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
-      '|40|_|%E2%80%A2',
-      new google.maps.Size(21, 34),
-      new google.maps.Point(0, 0),
-      new google.maps.Point(10, 34),
-      new google.maps.Size(21, 34));
-   return markerImage;
-}
-
-/*carrega os marcadores com base no array passado por parametro*/
-function loadMarkers(arrayLocations) {
-   // define o icone padrao ao carregar o mapa, passando uma cor personalizada
-   var defaultIcon = makeMarkerIcon('4db6ac');
-
-   /* icone usado para destacr o marcador quando passar o mouse por cima ou quando
-   o marcador estiver selecionado clicado*/
-   var highlightedIcon = makeMarkerIcon('42a5f5');
-
-   /*antes de carregar os marcadores removemos da tela, se tiver algum*/
-   removeMarkers();
-
-   /*esvazia o array markers para carregar os novos marcadores*/
-   markers = [];
-
-   /*faz um loop no array locations e pegando o titulo e a posicao do marcador
-     cria a variavel marker e adiciona ao array markers*/
-   for (var i = 0; i < arrayLocations.length; i++) {
-      var title = arrayLocations[i].title;
-      var position = arrayLocations[i].location;
-
-      var marker = new google.maps.Marker({
-         map: map,
-         position: position,
-         title: title,
-         animation: google.maps.Animation.DROP,
-         icon: defaultIcon,
-         id: i
-      });
-      markers.push(marker);
-
-      /*se clicar no marcador, chama as funcoes de animar o marcadore e de criar
-         a infowindow*/
-      marker.addListener('click', function() {
-         console.log(self.filtro()[0].selected());
-         if(this.animating == false){
-            populateInfoWindow(this, infowindow);
-         } else {
-            infowindow.close();
-         }
-         animaMarker(this);
-      });
-
-      /*se passar o mouse por cima do marcador troca o icone do marcador*/
-      // marker.addListener('mouseover', function() {
-      //    this.setIcon(highlightedIcon);
-      // });
-
-      /*ao retirar o mouse de cima do marcador retorna o icone para o padrao*/
-      // marker.addListener('mouseout', function() {
-      //    this.setIcon(defaultIcon);
-      // });
-
-      /*funcao que cria e configura a infowindow*/
-      function populateInfoWindow(marker, infowindow) {
-         var conteudo = '<div id="content">' +
-            '<div id="siteNotice">' +
-            '</div>' +
-            '<h1 id="firstHeading" class="firstHeading">' + marker.title + '</h1>' +
-            '<div id="bodyContent">' +
-            '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
-            'sandstone rock formation in the southern part of the ' +
-            'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) ' +
-            'south west of the nearest large town, Alice Springs; 450&#160;km ' +
-            '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major ' +
-            'features of the Uluru - Kata Tjuta National Park. Uluru is ' +
-            'sacred to the Pitjantjatjara and Yankunytjatjara, the ' +
-            'Aboriginal people of the area. It has many springs, waterholes, ' +
-            'rock caves and ancient paintings. Uluru is listed as a World ' +
-            'Heritage Site.</p>' +
-            '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
-            'https://en.wikipedia.org/w/index.php?title=Uluru</a> ' +
-            '(last visited June 22, 2009).</p>' +
-            '</div>' +
-            '</div>';
-         if (infowindow.marker != marker) {
-            infowindow.marker = marker;
-         };
-         infowindow.setContent(conteudo);
-         infowindow.open(map, marker);
-
-         /*se clicar no icone de fechar a infowindow chama a funca que fecha a
-            infowindow*/
-         infowindow.addListener('closeclick', function() {
-            infowindow.close();
-         });
-      };
-
-      function markersStopAnim(){
-         for(var i = 0; i < markers.length; i++){
-            markers[i].setAnimation(null);
-         }
+   /*remove os marcadores da tela*/
+   function removeMarkers() {
+      for (i = 0; i < markers.length; i++) {
+         markers[i].setMap(null);
       }
+   }
 
-      /*funcao que anima o marcador para dar destaque ao marcador selecionado*/
-      function animaMarker(marker) {
-         markersStopAnim();
+
+   /*funcao que carrega o icone do marcador na cor passada por parametro.
+     funcao usada no modulo: começando com APIs*/
+   function makeMarkerIcon(markerColor) {
+      var markerImage = new google.maps.MarkerImage(
+         'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
+         '|40|_|%E2%80%A2',
+         new google.maps.Size(21, 34),
+         new google.maps.Point(0, 0),
+         new google.maps.Point(10, 34),
+         new google.maps.Size(21, 34));
+      return markerImage;
+   }
+
+   /*carrega os marcadores com base no array passado por parametro*/
+   function loadMarkers(arrayLocations) {
+      // define o icone padrao ao carregar o mapa, passando uma cor personalizada
+      var defaultIcon = makeMarkerIcon('4db6ac');
+
+      /* icone usado para destacr o marcador quando passar o mouse por cima ou quando
+      o marcador estiver selecionado clicado*/
+      // var highlightedIcon = makeMarkerIcon('42a5f5');
+
+      /*antes de carregar os marcadores removemos da tela, se tiver algum*/
+      removeMarkers();
+
+      /*esvazia o array markers para carregar os novos marcadores*/
+      markers = [];
+
+      /*faz um loop no array locations e pegando o titulo e a posicao do marcador
+        cria a variavel marker e adiciona ao array markers*/
+      for (var i = 0; i < arrayLocations.length; i++) {
+         var title = arrayLocations[i].title;
+         var position = arrayLocations[i].location;
+
+         var marker = new google.maps.Marker({
+            map: map,
+            position: position,
+            title: title,
+            animation: google.maps.Animation.DROP,
+            icon: defaultIcon,
+            id: i
+         });
+         markers.push(marker);
+
+         /*se clicar no marcador, chama as funcoes de animar o marcadore e de criar
+            a infowindow*/
+         marker.addListener('click', function() {
+            var i = markers.indexOf(this);
+            if(vm.filtro()[aIndex].selected()){
+              markersStopAnim();
+              vm.filtro()[i].selected(!vm.filtro()[i].selected());
+            }
+            vm.filtro()[i].selected(!vm.filtro()[i].selected());
+            aIndex = i;
+
+            if (this.animating == false) {
+               populateInfoWindow(this, infowindow);
+            } else {
+               infowindow.close();
+            }
+            animaMarker(this);
+         });
+
+         /*se passar o mouse por cima do marcador troca o icone do marcador*/
+         // marker.addListener('mouseover', function() {
+         //    this.setIcon(highlightedIcon);
+         // });
+
+         /*ao retirar o mouse de cima do marcador retorna o icone para o padrao*/
+         // marker.addListener('mouseout', function() {
+         //    this.setIcon(defaultIcon);
+         // });
+
+         /*funcao que cria e configura a infowindow*/
+         function populateInfoWindow(marker, infowindow) {
+            var conteudo = '<div id="content">' +
+               '<div id="siteNotice">' +
+               '</div>' +
+               '<h1 id="firstHeading" class="firstHeading">' + marker.title + '</h1>' +
+               '<div id="bodyContent">' +
+               '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
+               'sandstone rock formation in the southern part of the ' +
+               'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) ' +
+               'south west of the nearest large town, Alice Springs; 450&#160;km ' +
+               '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major ' +
+               'features of the Uluru - Kata Tjuta National Park. Uluru is ' +
+               'sacred to the Pitjantjatjara and Yankunytjatjara, the ' +
+               'Aboriginal people of the area. It has many springs, waterholes, ' +
+               'rock caves and ancient paintings. Uluru is listed as a World ' +
+               'Heritage Site.</p>' +
+               '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
+               'https://en.wikipedia.org/w/index.php?title=Uluru</a> ' +
+               '(last visited June 22, 2009).</p>' +
+               '</div>' +
+               '</div>';
+            if (infowindow.marker != marker) {
+               infowindow.marker = marker;
+            };
+            infowindow.setContent(conteudo);
+            infowindow.open(map, marker);
+
+            /*se clicar no icone de fechar a infowindow chama a funca que fecha a
+               infowindow*/
+            infowindow.addListener('closeclick', function() {
+               infowindow.close();
+            });
+         };
+
+         /*funcao que anima o marcador para dar destaque ao marcador selecionado*/
+         function animaMarker(marker) {
             marker.setAnimation(google.maps.Animation.BOUNCE);
-      };
+         };
+      }
    }
-}
 
-function updateArray(array){
-   for(var i = 0; i < array.length; i++){
-      array[i].selected = ko.observable(false)
+
+   function markersStopAnim() {
+      for (var i = 0; i < markers.length; i++) {
+         markers[i].setAnimation(null);
+         self.filtro()[i].selected(false);
+      }
    }
-   return array;
-};
+
+   function updateArray(array) {
+      for (var i = 0; i < array.length; i++) {
+         array[i].selected = ko.observable(false)
+      }
+      return array;
+   };
 
 
-/*****************************************************************************/
+   /*****************************************************************************/
 
 
 
@@ -242,7 +251,6 @@ function updateArray(array){
     e aciona o evento click do marcador correspondente*/
    self.clickItem = function(item) {
       var i = self.filtro().indexOf(item);
-      self.filtro()[i].selected(!self.filtro()[i].selected());
       google.maps.event.trigger(markers[i], 'click');
    };
 }
