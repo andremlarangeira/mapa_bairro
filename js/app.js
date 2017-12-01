@@ -122,15 +122,16 @@ var ViewModel = function() {
             a infowindow*/
          marker.addListener('click', function() {
             var i = markers.indexOf(this);
-            if(vm.filtro()[aIndex].selected()){
-              markersStopAnim();
-              vm.filtro()[i].selected(!vm.filtro()[i].selected());
+            if (vm.filtro()[aIndex].selected()) {
+               markersStopAnim();
+               vm.filtro()[i].selected(!vm.filtro()[i].selected());
             }
             vm.filtro()[i].selected(!vm.filtro()[i].selected());
             aIndex = i;
 
             if (this.animating == false) {
-               populateInfoWindow(this, infowindow);
+               buscaWiki(resultadoWiki, this.title);
+               // populateInfoWindow(this, infowindow);
             } else {
                infowindow.close();
             }
@@ -253,6 +254,28 @@ var ViewModel = function() {
       var i = self.filtro().indexOf(item);
       google.maps.event.trigger(markers[i], 'click');
    };
+
+   function buscaWiki(resultado, busca) {
+      $.ajax({
+         url: '//en.wikipedia.org/w/api.php',
+         data: {
+            action: 'query',
+            list: 'search',
+            srsearch: busca,
+            format: 'json'
+         },
+         dataType: 'jsonp',
+         lllang: 'pt-br',
+         success: function(data) {
+            //  console.log('title', x.query.search[0].title);
+            if (resultado) resultado(data);
+         }
+      });
+   }
+
+   function resultadoWiki(data) {
+      console.log(data);
+   }
 }
 var vm = {};
 /*funcao de inicializacao knockoutjs*/
