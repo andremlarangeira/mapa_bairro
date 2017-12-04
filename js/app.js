@@ -8,12 +8,10 @@ icon.on('click', function() {
    var icon = $(this);
    menu.toggleClass("open");
    trocaIcone();
-   console.log(locations);
-
 });
 
 /* se o menu esta aberto carrega o icone de fechar senão carrega o icone da lupa*/
-var trocaIcone = function() {
+function trocaIcone() {
    if (menu.hasClass("open")) {
       $(".path").attr("d", "M10.185,1.417c-4.741,0-8.583,3.842-8.583,8.583c0,4.74,3.842,8.582,8.583,8.582S18.768,14.74,18.768,10C18.768,5.259,14.926,1.417,10.185,1.417 M10.185,17.68c-4.235,0-7.679-3.445-7.679-7.68c0-4.235,3.444-7.679,7.679-7.679S17.864,5.765,17.864,10C17.864,14.234,14.42,17.68,10.185,17.68 M10.824,10l2.842-2.844c0.178-0.176,0.178-0.46,0-0.637c-0.177-0.178-0.461-0.178-0.637,0l-2.844,2.841L7.341,6.52c-0.176-0.178-0.46-0.178-0.637,0c-0.178,0.176-0.178,0.461,0,0.637L9.546,10l-2.841,2.844c-0.178,0.176-0.178,0.461,0,0.637c0.178,0.178,0.459,0.178,0.637,0l2.844-2.841l2.844,2.841c0.178,0.178,0.459,0.178,0.637,0c0.178-0.176,0.178-0.461,0-0.637L10.824,10z");
    } else {
@@ -28,7 +26,6 @@ var markers = [];
 var infowindow = {};
 var locations = [];
 var aIndex = 0;
-// var vm = {};
 /*inicia o mapa e adiciona os marcadores*/
 function initMap() {
    map = new google.maps.Map(document.getElementById('map'), {
@@ -52,17 +49,11 @@ function initMap() {
 }
 
 
-
-
 /*viewmodel do knockoutjs*/
 var ViewModel = function() {
    /*passa o contexto de this que se refere ao viemodel para a variavel self,
       para usarmos nas funcoes e referenciar o viewmodel*/
    var self = this;
-
-
-
-
 
    /*****************************************************************************/
 
@@ -130,66 +121,56 @@ var ViewModel = function() {
             aIndex = i;
 
             if (this.animating == false) {
-               buscaWiki(resultadoWiki, this.title);
+               buscaWiki(resultadoWiki, this.title, this, infowindow);
                // populateInfoWindow(this, infowindow);
             } else {
                infowindow.close();
             }
             animaMarker(this);
          });
-
-         /*se passar o mouse por cima do marcador troca o icone do marcador*/
-         // marker.addListener('mouseover', function() {
-         //    this.setIcon(highlightedIcon);
-         // });
-
-         /*ao retirar o mouse de cima do marcador retorna o icone para o padrao*/
-         // marker.addListener('mouseout', function() {
-         //    this.setIcon(defaultIcon);
-         // });
-
-         /*funcao que cria e configura a infowindow*/
-         function populateInfoWindow(marker, infowindow) {
-            var conteudo = '<div id="content">' +
-               '<div id="siteNotice">' +
-               '</div>' +
-               '<h1 id="firstHeading" class="firstHeading">' + marker.title + '</h1>' +
-               '<div id="bodyContent">' +
-               '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
-               'sandstone rock formation in the southern part of the ' +
-               'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) ' +
-               'south west of the nearest large town, Alice Springs; 450&#160;km ' +
-               '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major ' +
-               'features of the Uluru - Kata Tjuta National Park. Uluru is ' +
-               'sacred to the Pitjantjatjara and Yankunytjatjara, the ' +
-               'Aboriginal people of the area. It has many springs, waterholes, ' +
-               'rock caves and ancient paintings. Uluru is listed as a World ' +
-               'Heritage Site.</p>' +
-               '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
-               'https://en.wikipedia.org/w/index.php?title=Uluru</a> ' +
-               '(last visited June 22, 2009).</p>' +
-               '</div>' +
-               '</div>';
-            if (infowindow.marker != marker) {
-               infowindow.marker = marker;
-            };
-            infowindow.setContent(conteudo);
-            infowindow.open(map, marker);
-
-            /*se clicar no icone de fechar a infowindow chama a funca que fecha a
-               infowindow*/
-            infowindow.addListener('closeclick', function() {
-               infowindow.close();
-            });
-         };
-
-         /*funcao que anima o marcador para dar destaque ao marcador selecionado*/
-         function animaMarker(marker) {
-            marker.setAnimation(google.maps.Animation.BOUNCE);
-         };
       }
    }
 
+   /*funcao que anima o marcador para dar destaque ao marcador selecionado*/
+   function animaMarker(marker) {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+   };
+
+   /*funcao que cria e configura a infowindow*/
+   function populateInfoWindow(marker, infowindow, data) {
+      var conteudo = '<div id="content">' +
+         '<div id="siteNotice">' +
+         '</div>' +
+         '<h1 id="firstHeading" class="firstHeading">' + marker.title + '</h1>' +
+         '<div id="bodyContent">' +
+         // '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
+         // 'sandstone rock formation in the southern part of the ' +
+         // 'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) ' +
+         // 'south west of the nearest large town, Alice Springs; 450&#160;km ' +
+         // '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major ' +
+         // 'features of the Uluru - Kata Tjuta National Park. Uluru is ' +
+         // 'sacred to the Pitjantjatjara and Yankunytjatjara, the ' +
+         // 'Aboriginal people of the area. It has many springs, waterholes, ' +
+         // 'rock caves and ancient paintings. Uluru is listed as a World ' +
+         // 'Heritage Site.</p>' +
+         // '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
+         // 'https://en.wikipedia.org/w/index.php?title=Uluru</a> ' +
+         // '(last visited June 22, 2009).</p>' +
+         data.query.search[0].snippet +
+         '</div>' +
+         '</div>';
+      if (infowindow.marker != marker) {
+         infowindow.marker = marker;
+      };
+      infowindow.setContent(conteudo);
+      infowindow.open(map, marker);
+
+      /*se clicar no icone de fechar a infowindow chama a funca que fecha a
+         infowindow*/
+      infowindow.addListener('closeclick', function() {
+         infowindow.close();
+      });
+   };
 
    function markersStopAnim() {
       for (var i = 0; i < markers.length; i++) {
@@ -255,7 +236,7 @@ var ViewModel = function() {
       google.maps.event.trigger(markers[i], 'click');
    };
 
-   function buscaWiki(resultado, busca) {
+   function buscaWiki(resultado, busca, marker, infowindow) {
       $.ajax({
          url: '//en.wikipedia.org/w/api.php',
          data: {
@@ -267,17 +248,20 @@ var ViewModel = function() {
          dataType: 'jsonp',
          lllang: 'pt-br',
          success: function(data) {
-            //  console.log('title', x.query.search[0].title);
-            if (resultado) resultado(data);
+            console.log();
+            if (resultado) resultado(data, marker, infowindow);
          }
       });
    }
 
-   function resultadoWiki(data) {
+   function resultadoWiki(data, marker, infowindow) {
       console.log(data);
+      populateInfoWindow(marker, infowindow, data);
    }
 }
+
 var vm = {};
+
 /*funcao de inicializacao knockoutjs*/
 function initKnokout() {
    vm = new ViewModel();
