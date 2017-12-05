@@ -255,7 +255,6 @@ var ViewModel = function() {
    }
 
    function resultadoWiki(data, marker, infowindow) {
-      console.log(data);
       populateInfoWindow(marker, infowindow, data);
    }
 }

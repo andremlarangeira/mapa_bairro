@@ -93,6 +93,10 @@ h1 {
    z-index: 0;
 }
 
+.firstHeading {
+   color: #000;
+}
+
 a {
    margin: 5px;
    padding: 6px;
@@ -108,6 +112,10 @@ a:hover {
 
 .selected {
    color: #009688;
+}
+
+div #content{
+   width: 300px;
 }
 
 @media screen and (max-width: 450px){
