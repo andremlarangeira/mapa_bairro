@@ -233,8 +233,17 @@ var ViewModel = function() {
     e aciona o evento click do marcador correspondente*/
    self.clickItem = function(item) {
       var i = self.filtro().indexOf(item);
+      var screenW = $(window).width();
+      if(screenW < 700) {
+         icon.trigger("click");
+      }
       google.maps.event.trigger(markers[i], 'click');
    };
+
+
+// /w/api.php?action=query&format=json&prop=langlinks&titles=Colugo&lllang=ru&lllimit=100
+// /w/api.php?action=query&format=json&prop=langlinks&titles=Colugo&lllimit=100
+
 
    function buscaWiki(resultado, busca, marker, infowindow) {
       $.ajax({
@@ -245,10 +254,12 @@ var ViewModel = function() {
             srsearch: busca,
             format: 'json'
          },
+         prop: 'langlinks',
+         lllang: 'pt-br',
          dataType: 'jsonp',
          lllang: 'pt-br',
          success: function(data) {
-            console.log();
+            console.log(data);
             if (resultado) resultado(data, marker, infowindow);
          }
       });
