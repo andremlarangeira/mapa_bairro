@@ -114,19 +114,13 @@ var ViewModel = function() {
          marker.addListener('click', function() {
             var i = markers.indexOf(this);
             if (vm.filtro()[aIndex].selected()) {
-               markersStopAnim();
-               vm.filtro()[i].selected(!vm.filtro()[i].selected());
-            }
-            vm.filtro()[i].selected(!vm.filtro()[i].selected());
-            aIndex = i;
-
-            if (this.animating == false) {
-               buscaWiki(resultadoWiki, this.title, this, infowindow);
-               // populateInfoWindow(this, infowindow);
+               markersStopAnim(aIndex);
             } else {
-               infowindow.close();
+               vm.filtro()[i].selected(!vm.filtro()[i].selected());
+               buscaWiki(resultadoWiki, this.title, this, infowindow);
+               animaMarker(this);
             }
-            animaMarker(this);
+            aIndex = i;
          });
       }
    }
@@ -143,19 +137,6 @@ var ViewModel = function() {
          '</div>' +
          '<h1 id="firstHeading" class="firstHeading">' + marker.title + '</h1>' +
          '<div id="bodyContent">' +
-         // '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
-         // 'sandstone rock formation in the southern part of the ' +
-         // 'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) ' +
-         // 'south west of the nearest large town, Alice Springs; 450&#160;km ' +
-         // '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major ' +
-         // 'features of the Uluru - Kata Tjuta National Park. Uluru is ' +
-         // 'sacred to the Pitjantjatjara and Yankunytjatjara, the ' +
-         // 'Aboriginal people of the area. It has many springs, waterholes, ' +
-         // 'rock caves and ancient paintings. Uluru is listed as a World ' +
-         // 'Heritage Site.</p>' +
-         // '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
-         // 'https://en.wikipedia.org/w/index.php?title=Uluru</a> ' +
-         // '(last visited June 22, 2009).</p>' +
          data.query.search[0].snippet +
          '</div>' +
          '</div>';
@@ -165,18 +146,19 @@ var ViewModel = function() {
       infowindow.setContent(conteudo);
       infowindow.open(map, marker);
 
-      /*se clicar no icone de fechar a infowindow chama a funca que fecha a
-         infowindow*/
+      /*se clicar no icone de fechar a infowindow aciona o evento closeclick do infowindow*/
       infowindow.addListener('closeclick', function() {
          infowindow.close();
+         markersStopAnim(infowindow.marker.id);
+
       });
    };
 
-   function markersStopAnim() {
-      for (var i = 0; i < markers.length; i++) {
-         markers[i].setAnimation(null);
-         self.filtro()[i].selected(false);
-      }
+   /* funcao que para a animacao do Marker e fecha a infowindow aberta*/
+   function markersStopAnim(i) {
+      markers[i].setAnimation(null);
+      self.filtro()[i].selected(false);
+      infowindow.close();
    }
 
    function updateArray(array) {
@@ -188,11 +170,6 @@ var ViewModel = function() {
 
 
    /*****************************************************************************/
-
-
-
-
-
 
 
    /*define os observables que serão usados no html para*/
@@ -234,17 +211,15 @@ var ViewModel = function() {
    self.clickItem = function(item) {
       var i = self.filtro().indexOf(item);
       var screenW = $(window).width();
-      if(screenW < 700) {
+      if (screenW < 700) {
          icon.trigger("click");
       }
       google.maps.event.trigger(markers[i], 'click');
    };
 
 
-// /w/api.php?action=query&format=json&prop=langlinks&titles=Colugo&lllang=ru&lllimit=100
-// /w/api.php?action=query&format=json&prop=langlinks&titles=Colugo&lllimit=100
 
-
+   /* funcao que busca na API do wikipedia informações sobre o local clicado*/
    function buscaWiki(resultado, busca, marker, infowindow) {
       $.ajax({
          url: '//en.wikipedia.org/w/api.php',
@@ -259,12 +234,12 @@ var ViewModel = function() {
          dataType: 'jsonp',
          lllang: 'pt-br',
          success: function(data) {
-            console.log(data);
             if (resultado) resultado(data, marker, infowindow);
          }
       });
    }
 
+   /*funcao chamada pela buscaWiki que popula a infowindow com as informacoes vindas do wikipedia*/
    function resultadoWiki(data, marker, infowindow) {
       populateInfoWindow(marker, infowindow, data);
    }
