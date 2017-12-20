@@ -1,58 +1,58 @@
 {
 	"locations": [
 		{
-			"title": "Casa",
+			"title": "Galeria do Rock",
 			"location": {
-				"lat": -22.738729,
-				"lng": -47.616529
+				"lat": -23.543702,
+				"lng": -46.638691
 			},
 			"selected": false
 		},
 		{
-			"title": "Coop",
+			"title": "Mercado Municipal de São Paulo",
 			"location": {
-				"lat": -22.738893,
-				"lng": -47.628706
+				"lat": -23.542372,
+				"lng": -46.629877
 			},
 			"selected": false
 		},
 		{
-			"title": "Lobato",
+			"title": "Beco do Batman",
 			"location": {
-				"lat": -22.746132,
-				"lng": -47.635882
+				"lat": -23.556572,
+				"lng": -46.686614
 			},
 			"selected": false
 		},
 		{
-			"title": "Padaria",
+			"title": "Museu do Futebol",
 			"location": {
-				"lat": -22.7389413,
-				"lng": -47.6252318
+				"lat": -23.547279,
+				"lng": -46.664655
 			},
 			"selected": false
 		},
 		{
-			"title": "Terminal",
+			"title": "Estação da Luz",
 			"location": {
-				"lat": -22.7358604,
-				"lng": -47.6292229
+				"lat": -23.535151,
+				"lng": -46.635241
 			},
 			"selected": false
 		},
 		{
-			"title": "Condominio",
+			"title": "Parque Ibirapuera",
 			"location": {
-				"lat": -22.7369278,
-				"lng": -47.6299448
+				"lat": -23.586344,
+				"lng": -46.658238
 			},
 			"selected": false
 		},
 		{
-			"title": "Banco Bradesco",
+			"title": "Biblioteca Monteiro Lobato",
 			"location": {
-				"lat": -22.7380874,
-				"lng": -47.6292498
+				"lat": -23.545193,
+				"lng": -46.649405
 			},
 			"selected": false
 		}
