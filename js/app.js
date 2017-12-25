@@ -26,6 +26,7 @@ var markers = [];
 var infowindow = {};
 var locations = [];
 var aIndex = 0;
+
 /*inicia o mapa e adiciona os marcadores*/
 function initMap() {
    map = new google.maps.Map(document.getElementById('map'), {
@@ -43,11 +44,139 @@ function initMap() {
       locations = data.locations;
       /*inicia o knockoutjs*/
       initKnokout();
-      /*chama a funcao loadMarkers que carrega os marcadores com base no array locations*/
-      //loadMarkers(locations);
    });
 }
 
+/*se o script do google Maps não carregar corretamente exibi um alerta informando
+  o erro*/
+function mapError() {
+   alert("Não foi possivel carregar o mapa. Recarregue a Página para tentar novamente!");
+}
+
+/*remove os marcadores da tela*/
+function removeMarkers() {
+   for (i = 0; i < markers.length; i++) {
+      markers[i].setMap(null);
+   }
+}
+
+/*funcao que carrega o icone do marcador na cor passada por parametro.
+  funcao usada no modulo: começando com APIs*/
+function makeMarkerIcon(markerColor) {
+   var markerImage = new google.maps.MarkerImage(
+      'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
+      '|40|_|%E2%80%A2',
+      new google.maps.Size(21, 34),
+      new google.maps.Point(0, 0),
+      new google.maps.Point(10, 34),
+      new google.maps.Size(21, 34));
+   return markerImage;
+}
+
+/*carrega os marcadores com base no array passado por parametro*/
+function loadMarkers(arrayLocations) {
+   // define o icone padrao ao carregar o mapa, passando uma cor personalizada
+   var defaultIcon = makeMarkerIcon('4db6ac');
+
+   /*antes de carregar os marcadores removemos da tela, se tiver algum*/
+   removeMarkers();
+
+   /*esvazia o array markers para carregar os novos marcadores*/
+   markers = [];
+
+   /*faz um loop no array locations e pegando o titulo e a posicao do marcador
+     cria a variavel marker e adiciona ao array markers*/
+   for (var i = 0; i < arrayLocations.length; i++) {
+      var title = arrayLocations[i].title;
+      var position = arrayLocations[i].location;
+
+      var marker = new google.maps.Marker({
+         map: map,
+         position: position,
+         title: title,
+         animation: google.maps.Animation.DROP,
+         icon: defaultIcon,
+         id: i
+      });
+      markers.push(marker);
+
+      /*se clicar no marcador, chama as funcoes de animar o marcadore e de criar
+         a infowindow*/
+      marker.addListener('click', function() {
+         var i = markers.indexOf(this);
+         if (vm.filtro()[aIndex].selected()) {
+            markersStopAnim(aIndex);
+         } else {
+            vm.filtro()[i].selected(!vm.filtro()[i].selected());
+            buscaWiki(resultadoWiki, this.title, this, infowindow);
+            animaMarker(this);
+         }
+         aIndex = i;
+      });
+   }
+}
+
+/*funcao que anima o marcador para dar destaque ao marcador selecionado*/
+function animaMarker(marker) {
+   marker.setAnimation(google.maps.Animation.BOUNCE);
+};
+
+/*funcao que cria e configura a infowindow*/
+function populateInfoWindow(marker, infowindow, data) {
+   var conteudo = '<div id="content">' +
+      '<div id="siteNotice">' +
+      '</div>' +
+      '<h1 id="firstHeading" class="firstHeading">' + marker.title + '</h1>' +
+      '<div id="bodyContent">' +
+      data.query.search[0].snippet +
+      '</div>' +
+      '</div>';
+   if (infowindow.marker != marker) {
+      infowindow.marker = marker;
+   };
+   infowindow.setContent(conteudo);
+   infowindow.open(map, marker);
+
+   /*se clicar no icone de fechar a infowindow aciona o evento closeclick do infowindow*/
+   infowindow.addListener('closeclick', function() {
+      infowindow.close();
+      markersStopAnim(infowindow.marker.id);
+
+   });
+};
+
+/* funcao que para a animacao do Marker e fecha a infowindow aberta*/
+function markersStopAnim(i) {
+   markers[i].setAnimation(null);
+   self.filtro()[i].selected(false);
+   infowindow.close();
+}
+
+
+/* funcao que busca na API do wikipedia informações sobre o local clicado*/
+function buscaWiki(resultado, busca, marker, infowindow) {
+   $.ajax({
+      url: '//en.wikipedia.org/w/api.php',
+      data: {
+         action: 'query',
+         list: 'search',
+         srsearch: busca,
+         format: 'json'
+      },
+      prop: 'langlinks',
+      lllang: 'pt-br',
+      dataType: 'jsonp',
+      lllang: 'pt-br',
+      success: function(data) {
+         if (resultado) resultado(data, marker, infowindow);
+      }
+   });
+}
+
+/*funcao chamada pela buscaWiki que popula a infowindow com as informacoes vindas do wikipedia*/
+function resultadoWiki(data, marker, infowindow) {
+   populateInfoWindow(marker, infowindow, data);
+}
 
 /*viewmodel do knockoutjs*/
 var ViewModel = function() {
@@ -55,111 +184,6 @@ var ViewModel = function() {
       para usarmos nas funcoes e referenciar o viewmodel*/
    var self = this;
 
-   /*****************************************************************************/
-
-   /*remove os marcadores da tela*/
-   function removeMarkers() {
-      for (i = 0; i < markers.length; i++) {
-         markers[i].setMap(null);
-      }
-   }
-
-
-   /*funcao que carrega o icone do marcador na cor passada por parametro.
-     funcao usada no modulo: começando com APIs*/
-   function makeMarkerIcon(markerColor) {
-      var markerImage = new google.maps.MarkerImage(
-         'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
-         '|40|_|%E2%80%A2',
-         new google.maps.Size(21, 34),
-         new google.maps.Point(0, 0),
-         new google.maps.Point(10, 34),
-         new google.maps.Size(21, 34));
-      return markerImage;
-   }
-
-   /*carrega os marcadores com base no array passado por parametro*/
-   function loadMarkers(arrayLocations) {
-      // define o icone padrao ao carregar o mapa, passando uma cor personalizada
-      var defaultIcon = makeMarkerIcon('4db6ac');
-
-      /* icone usado para destacr o marcador quando passar o mouse por cima ou quando
-      o marcador estiver selecionado clicado*/
-      // var highlightedIcon = makeMarkerIcon('42a5f5');
-
-      /*antes de carregar os marcadores removemos da tela, se tiver algum*/
-      removeMarkers();
-
-      /*esvazia o array markers para carregar os novos marcadores*/
-      markers = [];
-
-      /*faz um loop no array locations e pegando o titulo e a posicao do marcador
-        cria a variavel marker e adiciona ao array markers*/
-      for (var i = 0; i < arrayLocations.length; i++) {
-         var title = arrayLocations[i].title;
-         var position = arrayLocations[i].location;
-
-         var marker = new google.maps.Marker({
-            map: map,
-            position: position,
-            title: title,
-            animation: google.maps.Animation.DROP,
-            icon: defaultIcon,
-            id: i
-         });
-         markers.push(marker);
-
-         /*se clicar no marcador, chama as funcoes de animar o marcadore e de criar
-            a infowindow*/
-         marker.addListener('click', function() {
-            var i = markers.indexOf(this);
-            if (vm.filtro()[aIndex].selected()) {
-               markersStopAnim(aIndex);
-            } else {
-               vm.filtro()[i].selected(!vm.filtro()[i].selected());
-               buscaWiki(resultadoWiki, this.title, this, infowindow);
-               animaMarker(this);
-            }
-            aIndex = i;
-         });
-      }
-   }
-
-   /*funcao que anima o marcador para dar destaque ao marcador selecionado*/
-   function animaMarker(marker) {
-      marker.setAnimation(google.maps.Animation.BOUNCE);
-   };
-
-   /*funcao que cria e configura a infowindow*/
-   function populateInfoWindow(marker, infowindow, data) {
-      var conteudo = '<div id="content">' +
-         '<div id="siteNotice">' +
-         '</div>' +
-         '<h1 id="firstHeading" class="firstHeading">' + marker.title + '</h1>' +
-         '<div id="bodyContent">' +
-         data.query.search[0].snippet +
-         '</div>' +
-         '</div>';
-      if (infowindow.marker != marker) {
-         infowindow.marker = marker;
-      };
-      infowindow.setContent(conteudo);
-      infowindow.open(map, marker);
-
-      /*se clicar no icone de fechar a infowindow aciona o evento closeclick do infowindow*/
-      infowindow.addListener('closeclick', function() {
-         infowindow.close();
-         markersStopAnim(infowindow.marker.id);
-
-      });
-   };
-
-   /* funcao que para a animacao do Marker e fecha a infowindow aberta*/
-   function markersStopAnim(i) {
-      markers[i].setAnimation(null);
-      self.filtro()[i].selected(false);
-      infowindow.close();
-   }
 
    function updateArray(array) {
       for (var i = 0; i < array.length; i++) {
@@ -167,9 +191,6 @@ var ViewModel = function() {
       }
       return array;
    };
-
-
-   /*****************************************************************************/
 
 
    /*define os observables que serão usados no html para*/
@@ -217,32 +238,6 @@ var ViewModel = function() {
       google.maps.event.trigger(markers[i], 'click');
    };
 
-
-
-   /* funcao que busca na API do wikipedia informações sobre o local clicado*/
-   function buscaWiki(resultado, busca, marker, infowindow) {
-      $.ajax({
-         url: '//en.wikipedia.org/w/api.php',
-         data: {
-            action: 'query',
-            list: 'search',
-            srsearch: busca,
-            format: 'json'
-         },
-         prop: 'langlinks',
-         lllang: 'pt-br',
-         dataType: 'jsonp',
-         lllang: 'pt-br',
-         success: function(data) {
-            if (resultado) resultado(data, marker, infowindow);
-         }
-      });
-   }
-
-   /*funcao chamada pela buscaWiki que popula a infowindow com as informacoes vindas do wikipedia*/
-   function resultadoWiki(data, marker, infowindow) {
-      populateInfoWindow(marker, infowindow, data);
-   }
 }
 
 var vm = {};

@@ -1,8 +1,9 @@
-#**Mapa Bairro**#
+**Mapa Bairro**
 =============================
 
 
-##Instruções:##
+Instruções:
+----------------------------
 
 - Para executar o aplicativo certifique-se de estar rodando o arquivo *index.html*
   de um servidor HTTP. Isso é necessário pois o arquivo *js/locations.js* (arquivo
