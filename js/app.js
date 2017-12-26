@@ -169,6 +169,9 @@ function buscaWiki(resultado, busca, marker, infowindow) {
       lllang: 'pt-br',
       success: function(data) {
          if (resultado) resultado(data, marker, infowindow);
+      },
+      error: function(XHR){
+         alert("Erro ao consultar o wikipedia, por favor tente novamente");
       }
    });
 }
